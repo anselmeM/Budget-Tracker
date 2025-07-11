@@ -1,153 +1,186 @@
 // screens/ReportsScreen.js
 
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { BarChart, LineChart } from 'react-native-chart-kit';
+import { useTransactions } from '../context/TransactionContext';
+import { ArrowLeftIcon } from '../components/icons';
 
-// --- Icon Components ---
-const ArrowLeftIcon = ({ color = '#111418' }) => (
-  <Svg width="24" height="24" fill={color} viewBox="0 0 256 256">
-    <Path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></Path>
-  </Svg>
-);
+const screenWidth = Dimensions.get('window').width;
 
-// --- Chart Components ---
-const SpendingBarChart = () => {
-    const categories = [
-        { name: 'Food', percent: '20%' },
-        { name: 'Transportation', percent: '20%' },
-        { name: 'Entertainment', percent: '100%' },
-        { name: 'Utilities', percent: '70%' },
-        { name: 'Shopping', percent: '60%' },
-    ];
-    return (
-        <View style={styles.barChartContainer}>
-            {categories.map((cat, index) => (
-                <React.Fragment key={index}>
-                    <Text style={styles.barChartLabel}>{cat.name}</Text>
-                    <View style={styles.barWrapper}>
-                        <View style={[styles.bar, { width: cat.percent }]} />
-                    </View>
-                </React.Fragment>
-            ))}
-        </View>
-    );
+const chartConfig = {
+  backgroundColor: '#f9f9f9',
+  backgroundGradientFrom: '#f9f9f9',
+  backgroundGradientTo: '#f9f9f9',
+  decimalPlaces: 2,
+  color: (opacity = 1) => `rgba(12, 127, 242, ${opacity})`,
+  labelColor: (opacity = 1) => `rgba(96, 117, 138, ${opacity})`,
+  style: {
+    borderRadius: 8,
+  },
+  propsForDots: {
+    r: '4',
+    strokeWidth: '2',
+    stroke: '#0c7ff2',
+  },
 };
 
-const SpendingLineChart = () => (
-    <View style={styles.lineChartContainer}>
-        <Svg height="150" width="100%" viewBox="-3 0 478 150" preserveAspectRatio="none">
-            <Defs>
-                <LinearGradient id="paint0_linear" x1="236" y1="1" x2="236" y2="149" gradientUnits="userSpaceOnUse">
-                    <Stop stopColor="#f0f2f5" />
-                    <Stop offset="1" stopColor="#f0f2f5" stopOpacity="0" />
-                </LinearGradient>
-            </Defs>
-            <Path
-                d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H326.769H0V109Z"
-                fill="url(#paint0_linear)"
-            />
-            <Path
-                d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25"
-                stroke="#60758a"
-                strokeWidth="3"
-                strokeLinecap="round"
-            />
-        </Svg>
-        <View style={styles.lineChartLabels}>
-            <Text style={styles.barChartLabel}>Jan</Text>
-            <Text style={styles.barChartLabel}>Feb</Text>
-            <Text style={styles.barChartLabel}>Mar</Text>
-            <Text style={styles.barChartLabel}>Apr</Text>
-            <Text style={styles.barChartLabel}>May</Text>
-            <Text style={styles.barChartLabel}>Jun</Text>
-        </View>
-    </View>
-);
+const ReportsScreen = ({ route, navigation }) => {
+  const { transactions } = useTransactions();
+  const [activeTab, setActiveTab] = useState(route.params?.initialTab || 'Spending');
 
-// --- Main Screen Component ---
-const ReportsScreen = ({ navigation }) => {
-  const [activeTab, setActiveTab] = useState('Spending');
+  useEffect(() => {
+    if (route.params?.initialTab) {
+      setActiveTab(route.params.initialTab);
+    }
+  }, [route.params?.initialTab]);
+
+  const expenses = transactions.filter(t => t.amount < 0);
+  const totalExpenses = expenses.reduce((sum, t) => sum + t.amount, 0);
+  const totalIncome = transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+
+  const categoryData = expenses.reduce((acc, { category, amount }) => {
+    const parentCategory = category.split('_')[0];
+    acc[parentCategory] = (acc[parentCategory] || 0) + Math.abs(amount);
+    return acc;
+  }, {});
+
+  const barChartData = {
+    labels: Object.keys(categoryData).map(c => c.charAt(0).toUpperCase() + c.slice(1)),
+    datasets: [{
+      data: Object.values(categoryData),
+    }],
+  };
+  
+  // 1. Calculate a dynamic width for the bar chart to allow for scrolling.
+  // We'll give each bar ~60 pixels of space.
+  const barChartWidth = Math.max(screenWidth - 32, barChartData.labels.length * 60);
+
+  const spendingByDay = expenses.reduce((acc, { date, amount }) => {
+    const day = new Date(date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+    acc[day] = (acc[day] || 0) + Math.abs(amount);
+    return acc;
+  }, {});
+
+  const lineChartData = {
+    labels: Object.keys(spendingByDay).reverse(),
+    datasets: [{
+      data: Object.values(spendingByDay).reverse(),
+    }],
+    legend: ["Spending Over Time"],
+  };
+
+  const renderSpendingTab = () => (
+    <>
+      <View style={styles.chartCard}>
+        <Text style={styles.chartCardTitle}>Spending by Category</Text>
+        <Text style={styles.chartCardSubtitleText}>This Month</Text>
+        {expenses.length > 0 ? (
+          // 2. Wrap the BarChart in a horizontal ScrollView.
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <BarChart
+              data={barChartData}
+              width={barChartWidth} // Use the dynamic width
+              height={220}
+              yAxisLabel="$"
+              chartConfig={chartConfig}
+              verticalLabelRotation={30} // Keep rotation for long labels
+              style={styles.chartStyle}
+              fromZero={true}
+            />
+          </ScrollView>
+        ) : <Text style={styles.noDataText}>No expense data available.</Text>}
+      </View>
+
+      <View style={styles.chartCard}>
+        <Text style={styles.chartCardTitle}>Spending Over Time</Text>
+        <Text style={styles.chartCardSubtitleText}>This Month</Text>
+        {expenses.length > 0 ? (
+          <LineChart
+            data={lineChartData}
+            width={screenWidth - 32} // Line chart can remain fixed width
+            height={220}
+            yAxisLabel="$"
+            chartConfig={chartConfig}
+            bezier
+            style={styles.chartStyle}
+            fromZero={true}
+          />
+        ) : <Text style={styles.noDataText}>No expense data available.</Text>}
+      </View>
+    </>
+  );
+
+  const renderIncomeTab = () => (
+    <View style={styles.chartCard}>
+      <Text style={styles.chartCardTitle}>Total Income</Text>
+      <Text style={styles.chartCardAmount}>${totalIncome.toFixed(2)}</Text>
+      <Text style={styles.chartCardSubtitleText}>This month</Text>
+    </View>
+  );
+
+  const renderSavingsTab = () => (
+    <View style={styles.chartCard}>
+      <Text style={styles.chartCardTitle}>Net Savings</Text>
+      <Text style={styles.chartCardAmount}>${(totalIncome + totalExpenses).toFixed(2)}</Text>
+      <Text style={styles.chartCardSubtitleText}>This month</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-        <ScrollView>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                    <ArrowLeftIcon />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Reports</Text>
-            </View>
+      <ScrollView>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <ArrowLeftIcon />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Reports</Text>
+          <View style={{ width: 48 }} />
+        </View>
 
-            {/* Top Tab Navigator */}
-            <View style={styles.topTabsContainer}>
-                <TouchableOpacity onPress={() => setActiveTab('Spending')} style={[styles.topTab, activeTab === 'Spending' && styles.activeTopTab]}>
-                    <Text style={[styles.topTabText, activeTab === 'Spending' && styles.activeTopTabText]}>Spending</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setActiveTab('Income')} style={[styles.topTab, activeTab === 'Income' && styles.activeTopTab]}>
-                    <Text style={[styles.topTabText, activeTab === 'Income' && styles.activeTopTabText]}>Income</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setActiveTab('Savings')} style={[styles.topTab, activeTab === 'Savings' && styles.activeTopTab]}>
-                    <Text style={[styles.topTabText, activeTab === 'Savings' && styles.activeTopTabText]}>Savings</Text>
-                </TouchableOpacity>
-            </View>
+        <View style={styles.topTabsContainer}>
+          <TouchableOpacity onPress={() => setActiveTab('Spending')} style={[styles.topTab, activeTab === 'Spending' && styles.activeTopTab]}>
+            <Text style={[styles.topTabText, activeTab === 'Spending' && styles.activeTopTabText]}>Spending</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setActiveTab('Income')} style={[styles.topTab, activeTab === 'Income' && styles.activeTopTab]}>
+            <Text style={[styles.topTabText, activeTab === 'Income' && styles.activeTopTabText]}>Income</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setActiveTab('Savings')} style={[styles.topTab, activeTab === 'Savings' && styles.activeTopTab]}>
+            <Text style={[styles.topTabText, activeTab === 'Savings' && styles.activeTopTabText]}>Savings</Text>
+          </TouchableOpacity>
+        </View>
 
-            {/* Content based on active tab */}
-            {activeTab === 'Spending' && (
-                <>
-                    <Text style={styles.sectionTitle}>Spending by category</Text>
-                    <View style={styles.chartCard}>
-                        <Text style={styles.chartCardTitle}>Spending by category</Text>
-                        <Text style={styles.chartCardAmount}>$1,234</Text>
-                        <View style={styles.chartCardSubtitle}>
-                            <Text style={styles.chartCardSubtitleText}>This month</Text>
-                            <Text style={[styles.chartCardSubtitleText, { color: '#078838' }]}>+12%</Text>
-                        </View>
-                        <SpendingBarChart />
-                    </View>
-
-                    <Text style={styles.sectionTitle}>Spending over time</Text>
-                    <View style={styles.chartCard}>
-                         <Text style={styles.chartCardTitle}>Spending over time</Text>
-                        <Text style={styles.chartCardAmount}>$1,234</Text>
-                        <View style={styles.chartCardSubtitle}>
-                            <Text style={styles.chartCardSubtitleText}>This month</Text>
-                            <Text style={[styles.chartCardSubtitleText, { color: '#078838' }]}>+12%</Text>
-                        </View>
-                        <SpendingLineChart />
-                    </View>
-                </>
-            )}
-            {/* You can add content for 'Income' and 'Savings' tabs here */}
-        </ScrollView>
+        {activeTab === 'Spending' && renderSpendingTab()}
+        {activeTab === 'Income' && renderIncomeTab()}
+        {activeTab === 'Savings' && renderSavingsTab()}
+      </ScrollView>
     </View>
   );
 };
 
-// --- Stylesheet ---
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#fff' },
-    header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 40, paddingBottom: 8 },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 40, paddingBottom: 8 },
     backButton: { width: 48, height: 48, alignItems: 'flex-start', justifyContent: 'center' },
-    headerTitle: { color: '#111418', fontSize: 18, fontWeight: 'bold', flex: 1, textAlign: 'center', marginRight: 48 },
+    headerTitle: { color: '#111418', fontSize: 18, fontWeight: 'bold' },
     topTabsContainer: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#dbe0e6', paddingHorizontal: 16, gap: 32 },
     topTab: { paddingVertical: 16, borderBottomWidth: 3, borderBottomColor: 'transparent' },
     activeTopTab: { borderBottomColor: '#111418' },
     topTabText: { color: '#60758a', fontSize: 14, fontWeight: 'bold' },
     activeTopTabText: { color: '#111418' },
-    sectionTitle: { color: '#111418', fontSize: 22, fontWeight: 'bold', paddingHorizontal: 16, paddingTop: 28, paddingBottom: 12 },
-    chartCard: { marginHorizontal: 16, padding: 16, borderRadius: 8, backgroundColor: '#f9f9f9', borderWidth: 1, borderColor: '#f0f2f5' },
+    chartCard: { marginHorizontal: 16, padding: 16, borderRadius: 8, backgroundColor: '#f9f9f9', borderWidth: 1, borderColor: '#f0f2f5', marginTop: 16 },
     chartCardTitle: { color: '#111418', fontSize: 16, fontWeight: '500' },
     chartCardAmount: { color: '#111418', fontSize: 32, fontWeight: 'bold', marginVertical: 4 },
-    chartCardSubtitle: { flexDirection: 'row', gap: 8 },
-    chartCardSubtitleText: { color: '#60758a', fontSize: 16 },
-    barChartContainer: { marginVertical: 12, display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 16, alignItems: 'center' },
-    barChartLabel: { color: '#60758a', fontSize: 13, fontWeight: 'bold' },
-    barWrapper: { backgroundColor: '#f0f2f5', height: 16, borderRadius: 8, overflow: 'hidden' },
-    bar: { height: '100%', backgroundColor: '#60758a', borderTopRightRadius: 8, borderBottomRightRadius: 8 },
-    lineChartContainer: { marginVertical: 16 },
-    lineChartLabels: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 8 }
+    chartCardSubtitleText: { color: '#60758a', fontSize: 16, marginBottom: 8 },
+    chartStyle: {
+        marginVertical: 8,
+        borderRadius: 8,
+    },
+    noDataText: {
+        textAlign: 'center',
+        paddingVertical: 40,
+        color: '#60758a',
+    }
 });
 
 export default ReportsScreen;
