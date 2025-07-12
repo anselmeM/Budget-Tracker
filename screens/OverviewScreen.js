@@ -1,7 +1,7 @@
 // screens/OverviewScreen.js
 
 import React from 'react';
-import { StyleSheet, View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Svg, { Path, G, Text as SvgText, TSpan } from 'react-native-svg';
 import { useTransactions } from '../context/TransactionContext';
 import { useSettings } from '../context/SettingsContext';
@@ -100,7 +100,14 @@ const ChartLegend = ({ data, navigation }) => (
 
 const OverviewScreen = ({ navigation }) => {
   const { transactions, monthlyTotals, isLoading: isTransactionsLoading } = useTransactions();
-  const { userName, profileImageUri, isLoading: isSettingsLoading } = useSettings();
+  const { userName, isLoading: isSettingsLoading } = useSettings();
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
 
   if (isTransactionsLoading || isSettingsLoading) {
     return <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#0c7ff2" /></View>;
@@ -134,19 +141,20 @@ const OverviewScreen = ({ navigation }) => {
     amount: amount,
     percentage: monthlyTotals.current.expenses === 0 ? 0 : ((amount / Math.abs(monthlyTotals.current.expenses)) * 100).toFixed(0),
   }));
+  
+  const greetingText = `${getGreeting()}, ${userName.split(' ')[0]}`;
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollableContent}>
         <View style={styles.header}>
           <View style={styles.headerIconPlaceholder} />
-          <Text style={styles.headerTitle}>{`Good Morning, ${userName.split(' ')[0]}`}</Text>
+          <Text style={styles.headerTitle}>Dashboard</Text>
           <TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate('Settings')}><GearIcon /></TouchableOpacity>
         </View>
 
         <View style={styles.profileSection}>
-          <Image style={styles.profileImage} source={{ uri: profileImageUri || 'https://i.pravatar.cc/300' }} />
-          <Text style={styles.profileName}>{userName}</Text>
+          <Text style={styles.profileName}>{greetingText}</Text>
           <Text style={styles.balanceLabel}>Total Balance</Text>
           <Text style={styles.balanceAmount}>{totalBalance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</Text>
         </View>
@@ -190,10 +198,9 @@ const styles = StyleSheet.create({
   headerIconPlaceholder: { width: 48 },
   headerTitle: { color: '#111418', fontSize: 18, fontWeight: 'bold' },
   settingsButton: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
-  profileSection: { alignItems: 'center', padding: 16 },
-  profileImage: { width: 128, height: 128, borderRadius: 64, marginBottom: 16 },
-  profileName: { color: '#111418', fontSize: 22, fontWeight: 'bold' },
-  balanceLabel: { color: '#60758a', fontSize: 16 },
+  profileSection: { alignItems: 'center', padding: 16, paddingTop: 24 },
+  profileName: { color: '#111418', fontSize: 22, fontWeight: 'bold', marginBottom: 8 },
+  balanceLabel: { color: '#60758a', fontSize: 16, marginBottom: 4 },
   balanceAmount: { color: '#111418', fontSize: 28, fontWeight: 'bold' },
   summaryContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, padding: 16 },
   summaryBox: { flex: 1, minWidth: 158, gap: 4, borderRadius: 8, padding: 16, borderWidth: 1, borderColor: '#dbe0e6', backgroundColor: '#fff' },
