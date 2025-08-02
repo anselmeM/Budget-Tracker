@@ -4,7 +4,8 @@ import React from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Switch, Alert } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-// Import our custom hook to use the settings context
+// Import our custom hooks
+import { useAuth } from '../context/AuthContext'; // 1. Import useAuth
 import { useSettings } from '../context/SettingsContext';
 import { useTransactions } from '../context/TransactionContext';
 
@@ -15,7 +16,7 @@ const CloudArrowDownIcon = ({ color = '#111518' }) => ( <Svg width="24" height="
 const CaretRightIcon = ({ color = '#111518' }) => ( <Svg width="24" height="24" fill={color} viewBox="0 0 256 256"><Path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></Path></Svg>);
 
 // --- Reusable Setting Item Component ---
-const SettingItem = ({ label, value, type = 'text', onValueChange, isEnabled, onPress }) => {
+const SettingItem = ({ label, value, type = 'text', onValueChange, isEnabled, onPress, labelStyle }) => {
   const renderValue = () => {
     switch (type) {
       case 'switch':
@@ -29,7 +30,7 @@ const SettingItem = ({ label, value, type = 'text', onValueChange, isEnabled, on
 
   return (
     <TouchableOpacity style={styles.settingItem} onPress={onPress} disabled={!onPress}>
-      <Text style={styles.itemLabel}>{label}</Text>
+      <Text style={[styles.itemLabel, labelStyle]}>{label}</Text>
       {renderValue()}
     </TouchableOpacity>
   );
@@ -37,6 +38,7 @@ const SettingItem = ({ label, value, type = 'text', onValueChange, isEnabled, on
 
 // --- Main Screen Component ---
 const SettingsScreen = ({ navigation }) => {
+  const { logout } = useAuth(); // 2. Get the logout function from context
   const {
     userName,
     profileImageUri,
@@ -58,11 +60,31 @@ const SettingsScreen = ({ navigation }) => {
     Alert.alert('Restore Data', 'This feature is not yet implemented.');
   };
 
+  // 3. Create the logout handler
+  const handleLogout = () => {
+    Alert.alert(
+      "Log Out",
+      "Are you sure you want to log out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        { 
+          text: "Log Out", 
+          onPress: () => logout(),
+          style: 'destructive'
+        }
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}><ArrowLeftIcon /></TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
+        <View style={{ width: 48 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -72,7 +94,6 @@ const SettingsScreen = ({ navigation }) => {
             source={{ uri: profileImageUri || 'https://i.pravatar.cc/300' }} 
           />
           <Text style={styles.profileName}>{userName}</Text>
-          {/* This button now navigates to the EditProfile screen */}
           <TouchableOpacity onPress={() => navigation.navigate('EditProfile')}>
             <Text style={styles.profileActionText}>Edit Profile</Text>
           </TouchableOpacity>
@@ -96,6 +117,11 @@ const SettingsScreen = ({ navigation }) => {
         
         <Text style={styles.sectionTitle}>About</Text>
         <SettingItem label="About & Help" type="icon" value={<CaretRightIcon />} onPress={() => Alert.alert('Help', 'This feature is not yet implemented.')} />
+        
+        {/* 4. Add the Logout Button */}
+        <View style={styles.logoutSection}>
+            <SettingItem label="Log Out" onPress={handleLogout} labelStyle={styles.logoutText} />
+        </View>
       </ScrollView>
     </View>
   );
@@ -105,9 +131,9 @@ const SettingsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   scrollContent: { paddingBottom: 40 },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 40, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#f0f2f5' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 40, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: '#f0f2f5' },
   backButton: { width: 48, height: 48, alignItems: 'flex-start', justifyContent: 'center' },
-  headerTitle: { color: '#111518', fontSize: 18, fontWeight: 'bold', flex: 1, textAlign: 'center', marginRight: 48 },
+  headerTitle: { color: '#111518', fontSize: 18, fontWeight: 'bold' },
   profileSection: { alignItems: 'center', paddingVertical: 24, gap: 8 },
   profileImage: { width: 128, height: 128, borderRadius: 64 },
   profileName: { color: '#111518', fontSize: 22, fontWeight: 'bold' },
@@ -116,6 +142,16 @@ const styles = StyleSheet.create({
   settingItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, minHeight: 56, borderBottomWidth: 1, borderBottomColor: '#f0f2f5' },
   itemLabel: { color: '#111518', fontSize: 16, flex: 1 },
   itemValue: { color: '#111518', fontSize: 16 },
+  logoutSection: {
+    marginTop: 32,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f2f5',
+  },
+  logoutText: {
+    color: '#e74c3c', // A red color to indicate a destructive action
+    textAlign: 'center',
+    flex: 1,
+  },
 });
 
 export default SettingsScreen;

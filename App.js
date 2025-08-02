@@ -8,13 +8,17 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { theme } from './styles/theme';
 
-// Import Providers
+// --- Import Providers ---
+import { AuthProvider, useAuth } from './context/AuthContext'; // Import new Auth context
 import { TransactionProvider } from './context/TransactionContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { BudgetProvider } from './context/BudgetContext';
-import { CategoryProvider } from './context/CategoryContext'; // Import the new provider
+import { CategoryProvider } from './context/CategoryContext';
 
 // --- Import All Screens ---
+import SplashScreen from './screens/SplashScreen';
+import LoginScreen from './screens/LoginScreen';
+import SignUpScreen from './screens/SignUpScreen';
 import OverviewScreen from './screens/OverviewScreen';
 import TransactionsScreen from './screens/TransactionsScreen';
 import BudgetScreen from './screens/BudgetScreen';
@@ -27,7 +31,7 @@ import EditTransactionScreen from './screens/EditTransactionScreen';
 import SetBudgetScreen from './screens/SetBudgetScreen';
 import AddCategoryScreen from './screens/AddCategoryScreen';
 
-// --- Import Icons from central file ---
+// --- Import Icons ---
 import {
   HouseIcon,
   ListBulletsIcon,
@@ -39,7 +43,9 @@ import {
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function TabNavigator() {
+// --- Main App Navigator (Tabs) ---
+// This is what the user sees after they log in.
+function MainAppTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -64,30 +70,58 @@ function TabNavigator() {
   );
 }
 
+// --- Root Navigator ---
+// This component decides which navigator to show.
+function RootNavigator() {
+    const { user, isLoading } = useAuth();
+
+    if (isLoading) {
+        return <SplashScreen />;
+    }
+
+    return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {user ? (
+                // User is signed in, show the main app with all its screens
+                <>
+                    <Stack.Screen name="MainTabs" component={MainAppTabs} />
+                    <Stack.Screen name="AddTransaction" component={AddTransactionScreen} options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="EditTransaction" component={EditTransactionScreen} options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="Settings" component={SettingsScreen} />
+                    <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+                    <Stack.Screen name="SetBudget" component={SetBudgetScreen} options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="AddCategory" component={AddCategoryScreen} options={{ presentation: 'modal' }} />
+                </>
+            ) : (
+                // No user is signed in, show the auth flow screens
+                <>
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                    <Stack.Screen name="SignUp" component={SignUpScreen} />
+                </>
+            )}
+        </Stack.Navigator>
+    );
+}
+
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-        <PaperProvider theme={theme}>
-            <TransactionProvider>
-                <SettingsProvider>
-                <BudgetProvider>
-                    <CategoryProvider>
-                    <NavigationContainer>
-                        <Stack.Navigator>
-                        <Stack.Screen name="MainTabs" component={TabNavigator} options={{ headerShown: false }} />
-                        <Stack.Screen name="AddTransaction" component={AddTransactionScreen} options={{ headerShown: false, presentation: 'modal' }} />
-                        <Stack.Screen name="EditTransaction" component={EditTransactionScreen} options={{ headerShown: false, presentation: 'modal' }} />
-                        <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
-                        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
-                        <Stack.Screen name="SetBudget" component={SetBudgetScreen} options={{ headerShown: false, presentation: 'modal' }} />
-                        <Stack.Screen name="AddCategory" component={AddCategoryScreen} options={{ headerShown: false, presentation: 'modal' }} />
-                        </Stack.Navigator>
-                    </NavigationContainer>
-                    </CategoryProvider>
-                </BudgetProvider>
-                </SettingsProvider>
-            </TransactionProvider>
-        </PaperProvider>
+      <PaperProvider theme={theme}>
+        <AuthProvider>
+          {/* All other providers are now nested inside AuthProvider */}
+          <TransactionProvider>
+            <SettingsProvider>
+              <BudgetProvider>
+                <CategoryProvider>
+                  <NavigationContainer>
+                    <RootNavigator />
+                  </NavigationContainer>
+                </CategoryProvider>
+              </BudgetProvider>
+            </SettingsProvider>
+          </TransactionProvider>
+        </AuthProvider>
+      </PaperProvider>
     </GestureHandlerRootView>
   );
 }
