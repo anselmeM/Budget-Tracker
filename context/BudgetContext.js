@@ -3,14 +3,12 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// A unique key to store and retrieve budget data from AsyncStorage.
 const BUDGET_STORAGE_KEY = '@app_budgets';
 
-// Default budgets if none are saved
 const MOCK_BUDGETS = [
-  { category: 'food', amount: 400 },
-  { category: 'transport', amount: 150 },
-  { category: 'entertainment', amount: 200 },
+  { category: 'food', amount: 400, period: 'monthly' },
+  { category: 'transport', amount: 150, period: 'monthly' },
+  { category: 'entertainment', amount: 50, period: 'weekly' },
 ];
 
 const BudgetContext = createContext();
@@ -52,29 +50,30 @@ export const BudgetProvider = ({ children }) => {
     }
   }, [budgets, isLoading]);
 
-  const setBudget = (category, amount) => {
+  const setBudget = (category, amount, period) => {
     setBudgets(prevBudgets => {
       const existingBudgetIndex = prevBudgets.findIndex(b => b.category === category);
       const newBudgets = [...prevBudgets];
+      const newBudget = { category, amount, period };
+
       if (existingBudgetIndex >= 0) {
-        newBudgets[existingBudgetIndex] = { category, amount };
+        newBudgets[existingBudgetIndex] = newBudget;
       } else {
-        newBudgets.push({ category, amount });
+        newBudgets.push(newBudget);
       }
       return newBudgets;
     });
   };
 
-  // Function to delete a budget by its category
+  // THE FIX: This function handles the actual deletion logic.
   const deleteBudget = (category) => {
     setBudgets(prevBudgets => prevBudgets.filter(b => b.category !== category));
   };
 
-
   const value = {
     budgets,
     setBudget,
-    deleteBudget, // Expose the delete function
+    deleteBudget, // Ensure the delete function is provided to the app
     isLoading,
   };
 

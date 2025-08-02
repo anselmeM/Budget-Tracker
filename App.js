@@ -5,6 +5,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Provider as PaperProvider } from 'react-native-paper';
+import { theme } from './styles/theme';
 
 // Import Providers
 import { TransactionProvider } from './context/TransactionContext';
@@ -49,8 +51,8 @@ function TabNavigator() {
           if (route.name === 'ReportsTab') return <PresentationChartIcon color={color} />;
           if (route.name === 'CategoriesTab') return <TagIcon color={color} />;
         },
-        tabBarActiveTintColor: '#0c7ff2',
-        tabBarInactiveTintColor: '#60758a',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.placeholder,
       })}
     >
       <Tab.Screen name="OverviewTab" component={OverviewScreen} options={{ tabBarLabel: 'Overview' }} />
@@ -65,26 +67,27 @@ function TabNavigator() {
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <TransactionProvider>
-        <SettingsProvider>
-          <BudgetProvider>
-            {/* 1. Add the CategoryProvider wrapper */}
-            <CategoryProvider>
-              <NavigationContainer>
-                <Stack.Navigator>
-                  <Stack.Screen name="MainTabs" component={TabNavigator} options={{ headerShown: false }} />
-                  <Stack.Screen name="AddTransaction" component={AddTransactionScreen} options={{ headerShown: false, presentation: 'modal' }} />
-                  <Stack.Screen name="EditTransaction" component={EditTransactionScreen} options={{ headerShown: false, presentation: 'modal' }} />
-                  <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
-                  <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
-                  <Stack.Screen name="SetBudget" component={SetBudgetScreen} options={{ headerShown: false, presentation: 'modal' }} />
-                  <Stack.Screen name="AddCategory" component={AddCategoryScreen} options={{ headerShown: false, presentation: 'modal' }} />
-                </Stack.Navigator>
-              </NavigationContainer>
-            </CategoryProvider>
-          </BudgetProvider>
-        </SettingsProvider>
-      </TransactionProvider>
+        <PaperProvider theme={theme}>
+            <TransactionProvider>
+                <SettingsProvider>
+                <BudgetProvider>
+                    <CategoryProvider>
+                    <NavigationContainer>
+                        <Stack.Navigator>
+                        <Stack.Screen name="MainTabs" component={TabNavigator} options={{ headerShown: false }} />
+                        <Stack.Screen name="AddTransaction" component={AddTransactionScreen} options={{ headerShown: false, presentation: 'modal' }} />
+                        <Stack.Screen name="EditTransaction" component={EditTransactionScreen} options={{ headerShown: false, presentation: 'modal' }} />
+                        <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
+                        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
+                        <Stack.Screen name="SetBudget" component={SetBudgetScreen} options={{ headerShown: false, presentation: 'modal' }} />
+                        <Stack.Screen name="AddCategory" component={AddCategoryScreen} options={{ headerShown: false, presentation: 'modal' }} />
+                        </Stack.Navigator>
+                    </NavigationContainer>
+                    </CategoryProvider>
+                </BudgetProvider>
+                </SettingsProvider>
+            </TransactionProvider>
+        </PaperProvider>
     </GestureHandlerRootView>
   );
 }

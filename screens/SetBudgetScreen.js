@@ -13,20 +13,17 @@ const SetBudgetScreen = ({ route, navigation }) => {
   const { budgetToEdit } = route.params || {};
   const isEditMode = !!budgetToEdit;
 
-  // Use the setBudget function from the context
   const { budgets, setBudget } = useBudgets();
   
-  // Initialize state based on whether we are editing or creating
   const [amount, setAmount] = useState(isEditMode ? budgetToEdit.amount.toString() : '');
   const [category, setCategory] = useState(isEditMode ? budgetToEdit.category : '');
+  const [period, setPeriod] = useState(isEditMode ? budgetToEdit.period : 'monthly');
 
   const availableCategories = useMemo(() => {
     const existingBudgetCategories = budgets.map(b => b.category);
-    // When creating a new budget, only show categories that don't have a budget yet.
-    // In edit mode, this list will be empty, which is fine since the picker is not shown.
     return Object.keys(CATEGORIES)
-      .filter(key => CATEGORIES[key].type === 'expense' && !existingBudgetCategories.includes(key));
-  }, [budgets]);
+      .filter(key => CATEGORIES[key].type === 'expense' && (isEditMode ? key === category : !existingBudgetCategories.includes(key)));
+  }, [budgets, isEditMode, category]);
 
   const handleSave = () => {
     if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
@@ -39,9 +36,7 @@ const SetBudgetScreen = ({ route, navigation }) => {
     }
 
     const newAmount = parseFloat(amount);
-
-    // The setBudget function from the context handles both adding and editing
-    setBudget(category, newAmount);
+    setBudget(category, newAmount, period);
     navigation.goBack();
   };
 
@@ -65,20 +60,24 @@ const SetBudgetScreen = ({ route, navigation }) => {
         <Text style={styles.label}>Category</Text>
         <View style={styles.pickerWrapper}>
           {isEditMode ? (
-            // In edit mode, display the category as non-editable text
             <Text style={styles.categoryText}>{category.charAt(0).toUpperCase() + category.slice(1)}</Text>
           ) : (
-            // In create mode, show the picker
-            <Picker
-              selectedValue={category}
-              onValueChange={(itemValue) => setCategory(itemValue)}
-            >
+            <Picker selectedValue={category} onValueChange={(itemValue) => setCategory(itemValue)}>
               <Picker.Item label="Select a category..." value="" />
               {availableCategories.map(catKey => (
                 <Picker.Item label={CATEGORIES[catKey].label} value={catKey} key={catKey} />
               ))}
             </Picker>
           )}
+        </View>
+
+        <Text style={styles.label}>Period</Text>
+        <View style={styles.pickerWrapper}>
+            <Picker selectedValue={period} onValueChange={(itemValue) => setPeriod(itemValue)}>
+              <Picker.Item label="Monthly" value="monthly" />
+              <Picker.Item label="Weekly" value="weekly" />
+              <Picker.Item label="Yearly" value="yearly" />
+            </Picker>
         </View>
       </View>
 
