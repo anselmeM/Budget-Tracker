@@ -8,16 +8,17 @@ import 'firebase/compat/firestore';
 // Import the necessary modules for React Native persistence
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from "expo-constants";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDN8o2lB4Lwn9GjpJ-2IMI0JJk3kW3ShMM",
-  authDomain: "budgettracker-8263b.firebaseapp.com",
-  projectId: "budgettracker-8263b",
-  storageBucket: "budgettracker-8263b.appspot.com",
-  messagingSenderId: "984211561050",
-  appId: "1:984211561050:web:b2db5ddb95d4d256d85663",
-  measurementId: "G-849FTWWDHC"
+  apiKey: Constants.expoConfig.extra.apiKey,
+  authDomain: Constants.expoConfig.extra.authDomain,
+  projectId: Constants.expoConfig.extra.projectId,
+  storageBucket: Constants.expoConfig.extra.storageBucket,
+  messagingSenderId: Constants.expoConfig.extra.messagingSenderId,
+  appId: Constants.expoConfig.extra.appId,
+  measurementId: Constants.expoConfig.extra.measurementId
 };
 
 // Initialize Firebase App
