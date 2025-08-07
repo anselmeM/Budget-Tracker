@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
+import PropTypes from 'prop-types';
 import { ReceiptIcon } from '../icons';
 
 const RightSwipeActions = ({ onPress }) => (
@@ -8,6 +9,10 @@ const RightSwipeActions = ({ onPress }) => (
     <Text style={styles.deleteText}>Delete</Text>
   </TouchableOpacity>
 );
+
+RightSwipeActions.propTypes = {
+  onPress: PropTypes.func.isRequired,
+};
 
 const TransactionListItem = ({ item, onDelete, onEdit, categoryLabel }) => (
   <Swipeable renderRightActions={() => <RightSwipeActions onPress={onDelete} />}>
@@ -27,6 +32,16 @@ const TransactionListItem = ({ item, onDelete, onEdit, categoryLabel }) => (
     </TouchableOpacity>
   </Swipeable>
 );
+
+TransactionListItem.propTypes = {
+  item: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    amount: PropTypes.number.isRequired,
+  }).isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  categoryLabel: PropTypes.string.isRequired,
+};
 
 const styles = StyleSheet.create({
   deleteBox: {

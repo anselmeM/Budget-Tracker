@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import PropTypes from 'prop-types';
 import { db } from '../firebase'; // Import Firestore instance
 import { useAuth } from './AuthContext'; // Import useAuth to get the current user
 
@@ -87,6 +88,10 @@ export const SettingsProvider = ({ children }) => {
       {children}
     </SettingsContext.Provider>
   );
+};
+
+SettingsProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useSettings = () => {

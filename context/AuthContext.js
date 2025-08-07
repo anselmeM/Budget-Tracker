@@ -11,6 +11,7 @@ import {
 import { doc, setDoc } from 'firebase/firestore'; // 1. Import Firestore functions
 import { Alert } from 'react-native';
 import { auth, db } from '../firebase'; // 2. Import db instance
+import PropTypes from 'prop-types';
 
 const AuthContext = createContext();
 
@@ -89,6 +90,10 @@ export const AuthProvider = ({ children }) => {
       {!isLoading && children}
     </AuthContext.Provider>
   );
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useAuth = () => {

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import PropTypes from 'prop-types';
 import { useCategories } from '../context/CategoryContext'; // 1. Import the context hook
 import { ArrowLeftIcon } from '../components/icons';
 
@@ -42,6 +43,12 @@ const AddCategoryScreen = ({ navigation }) => {
       </View>
     </View>
   );
+};
+
+AddCategoryScreen.propTypes = {
+  navigation: PropTypes.shape({
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const styles = StyleSheet.create({

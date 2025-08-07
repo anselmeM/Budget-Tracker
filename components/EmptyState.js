@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import PropTypes from 'prop-types';
 import { ReceiptIcon } from './icons';
 
 const EmptyState = ({ filterLabel }) => (
@@ -9,6 +10,10 @@ const EmptyState = ({ filterLabel }) => (
       <Text style={styles.emptySubText}>Your recent transactions will appear here.</Text>
     </View>
 );
+
+EmptyState.propTypes = {
+  filterLabel: PropTypes.string,
+};
 
 const styles = StyleSheet.create({
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32, gap: 16 },

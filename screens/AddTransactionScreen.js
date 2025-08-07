@@ -5,6 +5,7 @@ import { StyleSheet, View, Text, ScrollView, TextInput, TouchableOpacity, Platfo
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
+import PropTypes from 'prop-types';
 
 import { useTransactions } from '../context/TransactionContext';
 import { XIcon } from '../components/icons';
@@ -124,6 +125,12 @@ const AddTransactionScreen = ({ navigation }) => {
       </View>
     </View>
   );
+};
+
+AddTransactionScreen.propTypes = {
+  navigation: PropTypes.shape({
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const styles = StyleSheet.create({

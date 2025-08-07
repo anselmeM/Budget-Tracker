@@ -4,10 +4,15 @@ import React, { useState, useMemo } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Svg, { Path } from 'react-native-svg';
+import PropTypes from 'prop-types';
 import { useBudgets } from '../context/BudgetContext';
 import { CATEGORIES } from '../config/categories';
 
 const ArrowLeftIcon = ({ color = '#111518' }) => ( <Svg width="24" height="24" fill={color} viewBox="0 0 256 256"><Path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></Path></Svg>);
+
+ArrowLeftIcon.propTypes = {
+  color: PropTypes.string,
+};
 
 const SetBudgetScreen = ({ route, navigation }) => {
   const { budgetToEdit } = route.params || {};
@@ -88,6 +93,21 @@ const SetBudgetScreen = ({ route, navigation }) => {
       </View>
     </View>
   );
+};
+
+SetBudgetScreen.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      budgetToEdit: PropTypes.shape({
+        amount: PropTypes.number,
+        category: PropTypes.string,
+        period: PropTypes.string,
+      }),
+    }),
+  }),
+  navigation: PropTypes.shape({
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const styles = StyleSheet.create({

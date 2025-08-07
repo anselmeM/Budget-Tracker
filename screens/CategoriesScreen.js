@@ -1,6 +1,7 @@
 // screens/CategoriesScreen.js
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import PropTypes from 'prop-types';
 import { useCategories } from '../context/CategoryContext'; // 1. Import the context hook
 import { ArrowLeftIcon, PlusIcon } from '../components/icons';
 
@@ -13,6 +14,12 @@ const CategoryItem = ({ icon, label, onPress }) => (
     <Text style={styles.categoryLabel}>{label}</Text>
   </TouchableOpacity>
 );
+
+CategoryItem.propTypes = {
+  icon: PropTypes.element.isRequired,
+  label: PropTypes.string.isRequired,
+  onPress: PropTypes.func,
+};
 
 const CategoriesScreen = ({ navigation }) => {
   const { categories } = useCategories(); // 2. Get the dynamic categories from the context
@@ -53,6 +60,13 @@ const CategoriesScreen = ({ navigation }) => {
       </TouchableOpacity>
     </View>
   );
+};
+
+CategoriesScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 // --- Stylesheet ---

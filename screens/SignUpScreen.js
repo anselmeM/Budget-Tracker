@@ -15,6 +15,7 @@ import {
     Platform
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import PropTypes from 'prop-types';
 import { theme } from '../styles/theme';
 import { useAuth } from '../context/AuthContext';
 
@@ -26,6 +27,12 @@ const AppLogo = ({ color = '#000', size = 24 }) => (
         <Path d="M128 128V232" />
     </Svg>
 );
+
+AppLogo.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.number,
+};
+
 const AppleIcon = () => <Svg width="20" height="20" viewBox="0 0 24 24" fill="black"><Path d="M19.3,5.63a4.88,4.88,0,0,0-4.3-2.5C13.13,3.12,12.26,4,12,4s-.93-.88-2.7-.88A4.83,4.83,0,0,0,4.7,5.63C2.1,8.5.6,12.5,2.6,15.8,3.7,17.5,5.5,19,7.3,19a3.13,3.13,0,0,0,2.1-.75,1,1,0,0,0,.5-.75c0-.38,0-1.63,0-1.63a5.5,5.5,0,0,1-1.5-3.88,5.13,5.13,0,0,1,5.25-5.12,4.88,4.88,0,0,1,4.5,5.25,5.45,5.45,0,0,1-1.5,3.75s0,1.25,0,1.63a1,1,0,0,0,.5.75,3.13,3.13,0,0,0,2.1.75c1.8,0,3.6-1.5,4.7-3.2C24.6,12.5,21.9,8.5,19.3,5.63ZM12,1.5A2.88,2.88,0,0,0,9.5,3.25,2.5,2.5,0,0,0,12,5a2.5,2.5,0,0,0,2.5-1.75A2.88,2.88,0,0,0,12,1.5Z"/></Svg>;
 const GoogleIcon = () => <Svg width="20" height="20" viewBox="0 0 24 24" fill="none"><Path fillRule="evenodd" clipRule="evenodd" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM11.49 15.75V12.75H9V10.5H11.49V8.25H13.47V10.5H15.75V12.75H13.47V15.75H11.49Z" fill="#4285F4"/><Path fillRule="evenodd" clipRule="evenodd" d="M21.8,12.01C21.8,11.31,21.74,10.64,21.62,10H12V13.48H17.64C17.4,14.52,16.8,15.4,15.91,16L15.9,18.48H18.4C19.89,17.07,20.8,15.12,20.8,12.84C20.8,12.56,20.78,12.28,20.74,12H21.8V12.01Z" fill="#4285F4"/><Path fillRule="evenodd" clipRule="evenodd" d="M12 22C14.63,22,16.94,21.1,18.4,19.6L15.9,17.1C15.01,17.7,13.63,18.2,12,18.2C9.43,18.2,7.24,16.5,6.44,14.2H3.88V16.7C5.29,19.5,8.39,22,12,22Z" fill="#34A853"/><Path fillRule="evenodd" clipRule="evenodd" d="M6.44 14.2C6.2 13.5,6.06 12.76,6.06 12C6.06 11.24,6.2 10.5,6.44 9.8L3.88 7.3C2.88 9.1,2.3 10.5,2.3 12C2.3 13.5,2.88 14.9,3.88 16.7L6.44 14.2Z" fill="#FBBC05"/><Path fillRule="evenodd" clipRule="evenodd" d="M12 5.8C13.26 5.8 14.36 6.2 15.2 7L17.7 4.5C16.1 3 14.1 2 12 2C8.39 2 5.29 4.5 3.88 7.3L6.44 9.8C7.24 7.5 9.43 5.8 12 5.8Z" fill="#EA4335"/></Svg>;
 const FacebookIcon = () => <Svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><Path d="M12 2.04C6.5 2.04 2 6.53 2 12.06C2 17.06 5.66 21.21 10.44 21.96V14.96H7.9V12.06H10.44V9.85C10.44 7.34 11.93 5.96 14.22 5.96C15.31 5.96 16.45 6.15 16.45 6.15V8.62H15.19C13.95 8.62 13.56 9.39 13.56 10.18V12.06H16.34L15.89 14.96H13.56V21.96C18.34 21.21 22 17.06 22 12.06C22 6.53 17.5 2.04 12 2.04Z"/></Svg>;
@@ -122,6 +129,12 @@ const SignUpScreen = ({ navigation }) => {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
+};
+
+SignUpScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const styles = StyleSheet.create({

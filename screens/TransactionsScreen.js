@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { StyleSheet, View, Text,TouchableOpacity, SectionList, ActivityIndicator, RefreshControl } from 'react-native';
+import PropTypes from 'prop-types';
 import { useTransactions } from '../context/TransactionContext';
 import { useCategories } from '../context/CategoryContext';
 import TransactionListItem from '../components/transactions/TransactionListItem';
@@ -112,6 +113,20 @@ const TransactionsScreen = ({ route, navigation }) => {
       />
     </View>
   );
+};
+
+TransactionsScreen.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      filterType: PropTypes.string,
+      filterValue: PropTypes.string,
+      filterLabel: PropTypes.string,
+    }),
+  }),
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    setParams: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const styles = StyleSheet.create({

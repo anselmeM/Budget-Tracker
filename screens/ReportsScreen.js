@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { BarChart, LineChart } from 'react-native-chart-kit';
+import PropTypes from 'prop-types';
 import { useTransactions } from '../context/TransactionContext';
 import { ArrowLeftIcon } from '../components/icons';
 
@@ -156,6 +157,17 @@ const ReportsScreen = ({ route, navigation }) => {
       </ScrollView>
     </View>
   );
+};
+
+ReportsScreen.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      initialTab: PropTypes.string,
+    }),
+  }),
+  navigation: PropTypes.shape({
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const styles = StyleSheet.create({

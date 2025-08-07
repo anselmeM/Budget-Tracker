@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PropTypes from 'prop-types';
 
 const BUDGET_STORAGE_KEY = '@app_budgets';
 
@@ -86,6 +87,10 @@ export const BudgetProvider = ({ children }) => {
       {children}
     </BudgetContext.Provider>
   );
+};
+
+BudgetProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useBudgets = () => {

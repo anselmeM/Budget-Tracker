@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import PropTypes from 'prop-types';
 import { MagnifyingGlassIcon, ArrowUpDownIcon } from '../icons';
 
 const TransactionsListHeader = ({ 
@@ -9,7 +10,6 @@ const TransactionsListHeader = ({
   clearFilter, 
   activeFilter, 
   setActiveFilter, 
-  sortOrder, 
   cycleSortOrder, 
   getSortLabel 
 }) => (
@@ -39,6 +39,17 @@ const TransactionsListHeader = ({
     </View>
   </>
 );
+
+TransactionsListHeader.propTypes = {
+  searchText: PropTypes.string.isRequired,
+  setSearchText: PropTypes.func.isRequired,
+  filterLabel: PropTypes.string,
+  clearFilter: PropTypes.func.isRequired,
+  activeFilter: PropTypes.string.isRequired,
+  setActiveFilter: PropTypes.func.isRequired,
+  cycleSortOrder: PropTypes.func.isRequired,
+  getSortLabel: PropTypes.func.isRequired,
+};
 
 const styles = StyleSheet.create({
   searchContainer: { paddingHorizontal: 16, paddingVertical: 12 },

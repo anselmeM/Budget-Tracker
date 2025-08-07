@@ -3,6 +3,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Svg, { Path, G, Text as SvgText, TSpan } from 'react-native-svg';
+import PropTypes from 'prop-types';
 import { useTransactions } from '../context/TransactionContext';
 import { useSettings } from '../context/SettingsContext';
 import { GearIcon, ArrowUpIcon, ArrowDownIcon, PiggyBankIcon } from '../components/icons';
@@ -30,6 +31,14 @@ const SummaryCard = ({ title, icon, currentAmount, previousAmount, onPress }) =>
       </View>
     </TouchableOpacity>
   );
+};
+
+SummaryCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.element.isRequired,
+  currentAmount: PropTypes.number.isRequired,
+  previousAmount: PropTypes.number.isRequired,
+  onPress: PropTypes.func.isRequired,
 };
 
 const DonutChart = ({ data, totalSpending }) => {
@@ -72,6 +81,14 @@ const DonutChart = ({ data, totalSpending }) => {
   );
 };
 
+DonutChart.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    amount: PropTypes.number.isRequired,
+  })).isRequired,
+  totalSpending: PropTypes.number.isRequired,
+};
+
 const ChartLegend = ({ data, navigation }) => (
   <View style={styles.legendContainer}>
     {data.map((item, index) => (
@@ -97,6 +114,14 @@ const ChartLegend = ({ data, navigation }) => (
     ))}
   </View>
 );
+
+ChartLegend.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    percentage: PropTypes.string.isRequired,
+  })).isRequired,
+  navigation: PropTypes.object.isRequired,
+};
 
 const OverviewScreen = ({ navigation }) => {
   const { transactions, monthlyTotals, isLoading: isTransactionsLoading } = useTransactions();
@@ -188,6 +213,12 @@ const OverviewScreen = ({ navigation }) => {
       </ScrollView>
     </View>
   );
+};
+
+OverviewScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const styles = StyleSheet.create({

@@ -3,6 +3,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Switch, Alert } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import PropTypes from 'prop-types';
 
 // Import our custom hooks
 import { useAuth } from '../context/AuthContext'; // 1. Import useAuth
@@ -11,9 +12,13 @@ import { useTransactions } from '../context/TransactionContext';
 
 // --- Icon Components ---
 const ArrowLeftIcon = ({ color = '#111518' }) => ( <Svg width="24" height="24" fill={color} viewBox="0 0 256 256"><Path d="M224,128a8,8,0,0,1-8,8H59.31l58.35,58.34a8,8,0,0,1-11.32,11.32l-72-72a8,8,0,0,1,0-11.32l72-72a8,8,0,0,1,11.32,11.32L59.31,120H216A8,8,0,0,1,224,128Z"></Path></Svg>);
+ArrowLeftIcon.propTypes = { color: PropTypes.string };
 const CloudArrowUpIcon = ({ color = '#111518' }) => ( <Svg width="24" height="24" fill={color} viewBox="0 0 256 256"><Path d="M248,128a87.34,87.34,0,0,1-17.6,52.81,8,8,0,1,1-12.8-9.62A71.34,71.34,0,0,0,232,128a72,72,0,0,0-144,0,8,8,0,0,1-16,0,88,88,0,0,1,3.29-23.88C74.2,104,73.1,104,72,104a48,48,0,0,0,0,96H96a8,8,0,0,1,0,16H72A64,64,0,1,1,81.29,88.68,88,88,0,0,1,248,128Zm-90.34-5.66a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32L144,147.31V208a8,8,0,0,0,16,0V147.31l18.34,18.35a8,8,0,0,0,11.32-11.32Z"></Path></Svg>);
+CloudArrowUpIcon.propTypes = { color: PropTypes.string };
 const CloudArrowDownIcon = ({ color = '#111518' }) => ( <Svg width="24" height="24" fill={color} viewBox="0 0 256 256"><Path d="M248,128a87.34,87.34,0,0,1-17.6,52.81,8,8,0,1,1-12.8-9.62A71.34,71.34,0,0,0,232,128a72,72,0,0,0-144,0,8,8,0,0,1-16,0,88,88,0,0,1,3.29-23.88C74.2,104,73.1,104,72,104a48,48,0,0,0,0,96H96a8,8,0,0,1,0,16H72A64,64,0,1,1,81.29,88.68,88,88,0,0,1,248,128Zm-69.66,42.34L160,188.69V128a8,8,0,0,0-16,0v60.69l-18.34-18.35a8,8,0,0,0-11.32,11.32l32,32a8,8,0,0,0,11.32,0l32-32a8,8,0,0,0-11.32-11.32Z"></Path></Svg>);
+CloudArrowDownIcon.propTypes = { color: PropTypes.string };
 const CaretRightIcon = ({ color = '#111518' }) => ( <Svg width="24" height="24" fill={color} viewBox="0 0 256 256"><Path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"></Path></Svg>);
+CaretRightIcon.propTypes = { color: PropTypes.string };
 
 // --- Reusable Setting Item Component ---
 const SettingItem = ({ label, value, type = 'text', onValueChange, isEnabled, onPress, labelStyle }) => {
@@ -34,6 +39,16 @@ const SettingItem = ({ label, value, type = 'text', onValueChange, isEnabled, on
       {renderValue()}
     </TouchableOpacity>
   );
+};
+
+SettingItem.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.any,
+  type: PropTypes.string,
+  onValueChange: PropTypes.func,
+  isEnabled: PropTypes.bool,
+  onPress: PropTypes.func,
+  labelStyle: PropTypes.object,
 };
 
 // --- Main Screen Component ---
@@ -125,6 +140,13 @@ const SettingsScreen = ({ navigation }) => {
       </ScrollView>
     </View>
   );
+};
+
+SettingsScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 // --- Stylesheet ---

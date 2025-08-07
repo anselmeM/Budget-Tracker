@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TextInput, TouchableOpacity, Platform, Alert, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import * as ImagePicker from 'expo-image-picker';
+import PropTypes from 'prop-types';
 
 import { useTransactions } from '../context/TransactionContext';
 import { XIcon } from '../components/icons';
@@ -26,7 +26,7 @@ const EditTransactionScreen = ({ route, navigation }) => {
   const [category, setCategory] = useState(transaction.category);
   const [date, setDate] = useState(new Date(transaction.date));
   const [description, setDescription] = useState(transaction.title);
-  const [receiptImageUri, setReceiptImageUri] = useState(transaction.receiptImageUri);
+  const [receiptImageUri] = useState(transaction.receiptImageUri);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   // Effect to update the default category when the transaction type changes
@@ -108,6 +108,24 @@ const EditTransactionScreen = ({ route, navigation }) => {
       </View>
     </View>
   );
+};
+
+EditTransactionScreen.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      transaction: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        amount: PropTypes.number.isRequired,
+        category: PropTypes.string.isRequired,
+        date: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        receiptImageUri: PropTypes.string,
+      }).isRequired,
+    }).isRequired,
+  }).isRequired,
+  navigation: PropTypes.shape({
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const styles = StyleSheet.create({

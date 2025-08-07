@@ -1,6 +1,7 @@
 // context/CategoryContext.js
 
 import React, { createContext, useState, useContext } from 'react';
+import PropTypes from 'prop-types';
 import { CATEGORIES as initialCategories } from '../config/categories';
 import { QuestionIcon } from '../components/icons'; // Default icon for new categories
 
@@ -34,4 +35,8 @@ export const CategoryProvider = ({ children }) => {
       {children}
     </CategoryContext.Provider>
   );
+};
+
+CategoryProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };

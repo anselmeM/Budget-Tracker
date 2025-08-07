@@ -2,8 +2,8 @@
 
 import React, { useMemo, useRef } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, Animated } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { Swipeable } from 'react-native-gesture-handler';
+import PropTypes from 'prop-types';
 import { useBudgets } from '../context/BudgetContext';
 import { useTransactions } from '../context/TransactionContext';
 import { 
@@ -57,6 +57,13 @@ const BudgetItem = ({ category, spent, total, period }) => {
   );
 };
 
+BudgetItem.propTypes = {
+  category: PropTypes.string.isRequired,
+  spent: PropTypes.number.isRequired,
+  total: PropTypes.number.isRequired,
+  period: PropTypes.string.isRequired,
+};
+
 // --- Swipeable Budget Item Wrapper ---
 const SwipeableBudgetItem = ({ item, onDelete, onEdit }) => {
   const swipeableRef = useRef(null);
@@ -87,6 +94,12 @@ const SwipeableBudgetItem = ({ item, onDelete, onEdit }) => {
         </TouchableOpacity>
     </Swipeable>
   );
+};
+
+SwipeableBudgetItem.propTypes = {
+  item: PropTypes.object.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
 };
 
 
@@ -174,6 +187,13 @@ const BudgetScreen = ({ navigation }) => {
       </TouchableOpacity>
     </View>
   );
+};
+
+BudgetScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const styles = StyleSheet.create({

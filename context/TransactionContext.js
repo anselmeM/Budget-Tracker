@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useEffect, useMemo, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PropTypes from 'prop-types';
 
 const TRANSACTIONS_STORAGE_KEY = '@transactions_data';
 
@@ -127,6 +128,10 @@ export const TransactionProvider = ({ children }) => {
       {children}
     </TransactionContext.Provider>
   );
+};
+
+TransactionProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export const useTransactions = () => {
