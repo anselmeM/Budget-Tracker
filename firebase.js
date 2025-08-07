@@ -1,16 +1,12 @@
 // firebase.js
-
-// Import the compatibility layer
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
-
-// Import the necessary modules for React Native persistence
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from "expo-constants";
 
-// Your web app's Firebase configuration
+// Read the config from app.config.js and prepare it for Firebase
 const firebaseConfig = {
   apiKey: Constants.expoConfig.extra.apiKey,
   authDomain: Constants.expoConfig.extra.authDomain,
@@ -29,12 +25,12 @@ if (!firebase.apps.length) {
   app = firebase.app();
 }
 
-// Initialize Auth with persistence to save the user's session.
+// Initialize Auth with persistence
 initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage)
 });
 
-// Now, we can get the compat instances which will use the configured services.
+// Export the auth and db services
 const auth = firebase.auth();
 const db = firebase.firestore();
 
